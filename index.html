@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: #faf8f4;
+            color: #1a1208;
+            min-height: 100vh
+        }
+
+        .hero {
+            background: #1a0f00;
+            color: #fff;
+            padding: 3rem 2rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 30% 50%, #8b2500 0%, transparent 60%), radial-gradient(ellipse at 70% 30%, #3d1a00 0%, transparent 50%)
+        }
+
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.6rem;
+            font-weight: 900;
+            position: relative;
+            line-height: 1.1;
+            letter-spacing: -0.5px
+        }
+
+        .hero h1 span {
+            color: #f97316
+        }
+
+        .hero p {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1rem;
+            font-weight: 300;
+            margin-top: .8rem;
+            color: #c9bfaf;
+            position: relative;
+            letter-spacing: .3px
+        }
+
+        .badge-row {
+            display: flex;
+            gap: .5rem;
+            justify-content: center;
+            margin-top: 1.2rem;
+            position: relative;
+            flex-wrap: wrap
+        }
+
+        .badge {
+            background: rgba(255, 255, 255, .08);
+            border: 1px solid rgba(255, 255, 255, .15);
+            border-radius: 20px;
+            padding: .3rem .9rem;
+            font-size: .75rem;
+            font-weight: 500;
+            color: #e8d9c6
+        }
+
+        section {
+            padding: 2.5rem 1.5rem;
+            max-width: 860px;
+            margin: 0 auto
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: .4rem;
+            color: #1a0f00
+        }
+
+        .section-sub {
+            font-size: .85rem;
+            color: #7a6a55;
+            margin-bottom: 1.8rem;
+            font-weight: 400
+        }
+
+        /* CHART AREA */
+        .chart-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem
+        }
+
+        @media(min-width:600px) {
+            .chart-wrap {
+                flex-direction: row;
+                align-items: flex-start
+            }
+        }
+
+        canvas#pie {
+            max-width: 240px;
+            max-height: 240px;
+            flex-shrink: 0
+        }
+
+        .legend {
+            display: flex;
+            flex-direction: column;
+            gap: .7rem;
+            flex: 1
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: flex-start;
+            gap: .75rem;
+            cursor: pointer;
+            padding: .5rem .6rem;
+            border-radius: 8px;
+            transition: background .15s
+        }
+
+        .legend-item:hover {
+            background: rgba(0, 0, 0, .04)
+        }
+
+        .legend-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+            flex-shrink: 0;
+            margin-top: 2px
+        }
+
+        .legend-label {
+            font-size: .82rem;
+            font-weight: 600;
+            color: #1a0f00;
+            line-height: 1.2
+        }
+
+        .legend-pct {
+            font-size: .75rem;
+            color: #7a6a55;
+            margin-top: 1px
+        }
+
+        /* STATS ROW */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 2.5rem
+        }
+
+        .stat-card {
+            background: #fff;
+            border: 1px solid #ede8de;
+            border-radius: 12px;
+            padding: 1.2rem 1rem;
+            text-align: center
+        }
+
+        .stat-num {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 900;
+            line-height: 1;
+            color: #c2370b
+        }
+
+        .stat-unit {
+            font-size: .7rem;
+            color: #7a6a55;
+            margin-top: .3rem;
+            line-height: 1.4
+        }
+
+        /* DAMAGE GRID */
+        .damage-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem
+        }
+
+        .damage-card {
+            background: #fff;
+            border: 1px solid #ede8de;
+            border-radius: 12px;
+            padding: 1.2rem;
+            position: relative;
+            overflow: hidden
+        }
+
+        .damage-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            border-radius: 2px 0 0 2px
+        }
+
+        .damage-card.red::before {
+            background: #dc2626
+        }
+
+        .damage-card.orange::before {
+            background: #ea580c
+        }
+
+        .damage-card.amber::before {
+            background: #d97706
+        }
+
+        .damage-card.purple::before {
+            background: #7c3aed
+        }
+
+        .damage-card h4 {
+            font-size: .85rem;
+            font-weight: 600;
+            margin-bottom: .4rem;
+            color: #1a0f00
+        }
+
+        .damage-card p {
+            font-size: .77rem;
+            color: #7a6a55;
+            line-height: 1.5
+        }
+
+        .damage-tag {
+            display: inline-block;
+            font-size: .67rem;
+            font-weight: 600;
+            padding: .15rem .5rem;
+            border-radius: 20px;
+            margin-bottom: .6rem
+        }
+
+        .tag-r {
+            background: #fee2e2;
+            color: #991b1b
+        }
+
+        .tag-o {
+            background: #ffedd5;
+            color: #9a3412
+        }
+
+        .tag-a {
+            background: #fef3c7;
+            color: #92400e
+        }
+
+        .tag-p {
+            background: #ede9fe;
+            color: #4c1d95
+        }
+
+        /* COMPARE */
+        .compare {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem
+        }
+
+        .cmp {
+            background: #fff;
+            border: 1px solid #ede8de;
+            border-radius: 12px;
+            overflow: hidden
+        }
+
+        .cmp-head {
+            padding: .8rem 1rem;
+            font-weight: 700;
+            font-size: .9rem;
+            color: #fff
+        }
+
+        .cmp-head.rokok {
+            background: #991b1b
+        }
+
+        .cmp-head.vape {
+            background: #1d4ed8
+        }
+
+        .cmp-body {
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: .5rem
+        }
+
+        .cmp-item {
+            font-size: .78rem;
+            color: #3d2f1f;
+            display: flex;
+            align-items: flex-start;
+            gap: .5rem
+        }
+
+        .cmp-item::before {
+            content: '▸';
+            color: #7a6a55;
+            flex-shrink: 0;
+            margin-top: 1px
+        }
+
+        /* SOLUSI */
+        .solusi-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem
+        }
+
+        .sol-card {
+            background: #fff;
+            border: 1px solid #ede8de;
+            border-radius: 12px;
+            padding: 1.2rem;
+            display: flex;
+            gap: .9rem;
+            align-items: flex-start
+        }
+
+        .sol-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            flex-shrink: 0
+        }
+
+        .sol-card h4 {
+            font-size: .85rem;
+            font-weight: 600;
+            color: #1a0f00;
+            margin-bottom: .3rem
+        }
+
+        .sol-card p {
+            font-size: .77rem;
+            color: #7a6a55;
+            line-height: 1.5
+        }
+
+        /* HARAPAN */
+        .harapan {
+            background: linear-gradient(135deg, #0f3d0f 0%, #1a5c1a 50%, #0d4a1e 100%);
+            border-radius: 16px;
+            padding: 2.5rem 2rem;
+            color: #fff;
+            text-align: center
+        }
+
+        .harapan h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            color: #d1fae5;
+            margin-bottom: .5rem
+        }
+
+        .harapan p {
+            font-size: .88rem;
+            color: #a7f3d0;
+            line-height: 1.7;
+            max-width: 520px;
+            margin: 0 auto 1.5rem
+        }
+
+        .hope-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem
+        }
+
+        .hope-item {
+            background: rgba(255, 255, 255, .08);
+            border: 1px solid rgba(255, 255, 255, .12);
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center
+        }
+
+        .hope-num {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            font-weight: 900;
+            color: #6ee7b7;
+            line-height: 1
+        }
+
+        .hope-label {
+            font-size: .72rem;
+            color: #a7f3d0;
+            margin-top: .3rem;
+            line-height: 1.4
+        }
+
+        .divider {
+            border: none;
+            border-top: 1px solid #ede8de;
+            margin: 0 1.5rem
+        }
+
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            font-size: .72rem;
+            color: #b0a090;
+            font-style: italic
+        }
+
+        /* QUIZ */
+        .quiz-wrap {
+            background: #fff;
+            border: 1px solid #ede8de;
+            border-radius: 16px;
+            overflow: hidden
+        }
+
+        .quiz-header {
+            background: #1a0f00;
+            padding: 1.2rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: .8rem
+        }
+
+        .quiz-header h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem;
+            color: #fff;
+            font-weight: 700
+        }
+
+        .quiz-header span {
+            font-size: .75rem;
+            color: #c9bfaf;
+            margin-left: auto;
+            white-space: nowrap
+        }
+
+        .quiz-progress-bar {
+            height: 4px;
+            background: #2d1a00
+        }
+
+        .quiz-progress-fill {
+            height: 4px;
+            background: #f97316;
+            transition: width .4s ease;
+            width: 0%
+        }
+
+        .quiz-body {
+            padding: 1.5rem
+        }
+
+        .quiz-question {
+            font-size: .92rem;
+            font-weight: 600;
+            color: #1a0f00;
+            line-height: 1.5;
+            margin-bottom: 1.2rem;
+            min-height: 48px
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: .6rem
+        }
+
+        .quiz-option {
+            background: #faf8f4;
+            border: 1.5px solid #ede8de;
+            border-radius: 10px;
+            padding: .75rem 1rem;
+            font-size: .82rem;
+            color: #3d2f1f;
+            cursor: pointer;
+            text-align: left;
+            transition: all .18s;
+            font-family: 'DM Sans', sans-serif
+        }
+
+        .quiz-option:hover:not(:disabled) {
+            background: #fff7ed;
+            border-color: #f97316;
+            color: #9a3412
+        }
+
+        .quiz-option.correct {
+            background: #d1fae5;
+            border-color: #059669;
+            color: #065f46;
+            font-weight: 600
+        }
+
+        .quiz-option.wrong {
+            background: #fee2e2;
+            border-color: #dc2626;
+            color: #991b1b
+        }
+
+        .quiz-option.reveal {
+            background: #fef3c7;
+            border-color: #d97706;
+            color: #78350f
+        }
+
+        .quiz-option:disabled {
+            cursor: default
+        }
+
+        .quiz-explanation {
+            margin-top: 1rem;
+            padding: .8rem 1rem;
+            background: #faf8f4;
+            border-left: 3px solid #f97316;
+            border-radius: 0 8px 8px 0;
+            font-size: .78rem;
+            color: #7a6a55;
+            line-height: 1.6;
+            display: none
+        }
+
+        .quiz-explanation.show {
+            display: block
+        }
+
+        .quiz-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 1.2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #ede8de
+        }
+
+        .quiz-score-mini {
+            font-size: .78rem;
+            color: #7a6a55
+        }
+
+        .quiz-score-mini b {
+            color: #c2370b
+        }
+
+        .quiz-btn {
+            background: #1a0f00;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: .6rem 1.2rem;
+            font-size: .82rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            transition: background .15s
+        }
+
+        .quiz-btn:hover {
+            background: #c2370b
+        }
+
+        .quiz-btn:disabled {
+            background: #c9bfaf;
+            cursor: default
+        }
+
+        .quiz-result {
+            text-align: center;
+            padding: 1.5rem 1rem
+        }
+
+        .quiz-result-emoji {
+            font-size: 3rem;
+            margin-bottom: .5rem
+        }
+
+        .quiz-result h4 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            color: #1a0f00;
+            margin-bottom: .4rem
+        }
+
+        .quiz-result p {
+            font-size: .82rem;
+            color: #7a6a55;
+            line-height: 1.6;
+            max-width: 400px;
+            margin: 0 auto .8rem
+        }
+
+        .quiz-result .score-big {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.4rem;
+            font-weight: 900;
+            color: #c2370b;
+            line-height: 1
+        }
+
+        .quiz-restart {
+            background: #f97316;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: .65rem 1.4rem;
+            font-size: .84rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            margin-top: .5rem
+        }
+    </style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>Bahaya <span>Rokok</span> &amp; <span>Vape</span></h1>
+  <p>Fakta, Risiko, Solusi, dan Harapan untuk Indonesia Sehat</p>
+  <div class="badge-row">
+    <span class="badge">🫁 Saluran Napas</span>
+    <span class="badge">❤️ Jantung</span>
+    <span class="badge">🧠 Otak</span>
+    <span class="badge">🧪 Kanker</span>
+  </div>
+</div>
+
+<section>
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-num">39.217</div>
+      <div class="stat-unit">Estimasi kematian kanker akibat rokok di Indonesia tahun 2020 (SAM)</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">88%</div>
+      <div class="stat-unit">SAF kanker paru-paru pada laki-laki — proporsi tertinggi akibat rokok</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">3×</div>
+      <div class="stat-unit">Indonesia masuk 3 besar prevalensi perokok dunia (setelah China &amp; India)</div>
+    </div>
+  </div>
+
+  <div class="section-title">Kematian Kanker Akibat Rokok (SAM)</div>
+  <div class="section-sub">Distribusi Smoking Attributable Mortality (SAM) per jenis kanker di Indonesia 2020 — Sumber: Masrida et al., 2022 / GLOBOCAN 2020</div>
+
+  <div class="chart-wrap">
+    <canvas id="pie" role="img" aria-label="Diagram lingkaran kematian kanker akibat rokok. Kanker paru-paru 45,6%, Kanker faring 21,6%, Kanker hati 14,2%, Kanker kandung kemih 3,6%, Kanker laring 3,6%, Kanker lainnya 11,4%.">Kanker paru-paru 45,6%, Kanker faring 21,6%, Kanker hati 14,2%, Kanker kandung kemih 3,6%, Kanker laring 3,6%, Kanker lainnya 11,4%.</canvas>
+    <div class="legend" id="legend"></div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section>
+  <div class="section-title">Kerusakan pada Organ Tubuh</div>
+  <div class="section-sub">Rokok dan vape merusak hampir semua sistem organ penting</div>
+  <div class="damage-grid">
+    <div class="damage-card red">
+      <span class="damage-tag tag-r">Saluran Napas</span>
+      <h4>Paru-paru &amp; Laring</h4>
+      <p>SAF kanker paru-paru mencapai 88% pada laki-laki. Rokok mengandung karbon monoksida (CO) dan polycyclic aromatic hydrocarbon (PAH) seperti tar dan benzopiren yang bersifat karsinogen kuat.</p>
+    </div>
+    <div class="damage-card orange">
+      <span class="damage-tag tag-o">Kardiovaskular</span>
+      <h4>Jantung &amp; Pembuluh Darah</h4>
+      <p>Karbon monoksida mengurangi kapasitas oksigen darah; nikotin memicu vasokonstriksi dan meningkatkan risiko trombosis.</p>
+    </div>
+    <div class="damage-card amber">
+      <span class="damage-tag tag-a">Sistem Saraf</span>
+      <h4>Otak &amp; Kecanduan</h4>
+      <p>Nikotin mengaktifkan reseptor dopamin, menciptakan ketergantungan kuat yang setara dengan heroin menurut riset neurobiologi.</p>
+    </div>
+    <div class="damage-card purple">
+      <span class="damage-tag tag-p">Vape Khusus</span>
+      <h4>Cairan Aerosol &amp; Diacetyl</h4>
+      <p>Vape mengandung diacetyl yang menyebabkan "popcorn lung", serta logam berat (timbal, nikel) dari koil yang terhirup langsung.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section>
+  <div class="section-title">Rokok vs Vape — Perbandingan Risiko</div>
+  <div class="section-sub">Keduanya berbahaya; hanya berbeda dalam jenis racun yang dikandung</div>
+  <div class="compare">
+    <div class="cmp">
+      <div class="cmp-head rokok">🚬 Rokok Konvensional</div>
+      <div class="cmp-body">
+        <div class="cmp-item">Mengandung 7.000+ bahan kimia saat dibakar</div>
+        <div class="cmp-item">CO dan PAH (tar, benzopiren) bersifat karsinogen terbukti</div>
+        <div class="cmp-item">SAF kanker faring laki-laki mencapai 82,65% (Gandini et al., 2008)</div>
+        <div class="cmp-item">Asap pasif membahayakan orang sekitar</div>
+        <div class="cmp-item">Risiko kanker mulut, tenggorokan, paru, kandung kemih, laring</div>
+        <div class="cmp-item">Prevalensi perokok laki-laki Indonesia 82,7% (estimasi 2020)</div>
+      </div>
+    </div>
+    <div class="cmp">
+      <div class="cmp-head vape">💨 Vape / Rokok Elektrik</div>
+      <div class="cmp-body">
+        <div class="cmp-item">Aerosol mengandung nikotin kadar tinggi tidak terlabel</div>
+        <div class="cmp-item">Diacetyl → bronkiolitis obliterans (popcorn lung)</div>
+        <div class="cmp-item">Logam berat: timbal, nikel, tembaga dari koil rusak</div>
+        <div class="cmp-item">Populer di kalangan remaja → pintu gerbang ke rokok</div>
+        <div class="cmp-item">EVALI: kerusakan paru akut terkait penggunaan vape</div>
+        <div class="cmp-item">Regulasi lemah, kandungan cairan sering tidak terstandar</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section>
+  <div class="section-title">Solusi &amp; Langkah Nyata</div>
+  <div class="section-sub">Berhenti merokok bisa dimulai dari langkah kecil yang konsisten</div>
+  <div class="solusi-grid">
+    <div class="sol-card">
+      <div class="sol-icon" style="background:#fef3c7">💊</div>
+      <div>
+        <h4>Terapi Pengganti Nikotin (NRT)</h4>
+        <p>Permen karet, plester, atau inhaler nikotin membantu mengurangi gejala putus zat secara bertahap dan terbukti klinis efektif.</p>
+      </div>
+    </div>
+    <div class="sol-card">
+      <div class="sol-icon" style="background:#d1fae5">🧠</div>
+      <div>
+        <h4>Konseling &amp; Terapi Perilaku</h4>
+        <p>CBT (Cognitive Behavioral Therapy) membantu mengidentifikasi pemicu dan membangun kebiasaan baru pengganti merokok.</p>
+      </div>
+    </div>
+    <div class="sol-card">
+      <div class="sol-icon" style="background:#e0e7ff">🏃</div>
+      <div>
+        <h4>Olahraga &amp; Gaya Hidup Aktif</h4>
+        <p>Aktivitas fisik meningkatkan dopamin alami, mengurangi keinginan merokok, dan mempercepat pemulihan kapasitas paru.</p>
+      </div>
+    </div>
+    <div class="sol-card">
+      <div class="sol-icon" style="background:#fce7f3">👥</div>
+      <div>
+        <h4>Dukungan Komunitas &amp; Keluarga</h4>
+        <p>Bergabung dengan kelompok support atau melibatkan keluarga meningkatkan keberhasilan berhenti merokok hingga 60%.</p>
+      </div>
+    </div>
+    <div class="sol-card">
+      <div class="sol-icon" style="background:#ecfdf5">📱</div>
+      <div>
+        <h4>Aplikasi &amp; Hotline Quitline</h4>
+        <p>Hubungi hotline 119 ext 500 (Kemenkes RI) atau gunakan aplikasi Quit Now untuk panduan dan motivasi harian.</p>
+      </div>
+    </div>
+    <div class="sol-card">
+      <div class="sol-icon" style="background:#fff7ed">🏥</div>
+      <div>
+        <h4>Konsultasi Dokter &amp; Obat Resep</h4>
+        <p>Varenicline (Champix) dan Bupropion adalah obat resep yang terbukti menggandakan peluang keberhasilan berhenti merokok.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:0">
+  <div class="harapan">
+    <h2>🌱 Harapan untuk Indonesia Sehat</h2>
+    <p>Setiap hari tanpa rokok adalah kemenangan. Dalam 20 menit setelah berhenti, tekanan darah mulai turun. Dalam 10 tahun, risiko kanker paru berkurang separuh. Perubahan dimulai dari satu keputusan.</p>
+    <div class="hope-grid">
+      <div class="hope-item">
+        <div class="hope-num">20 mnt</div>
+        <div class="hope-label">Tekanan darah &amp; nadi mulai normal kembali</div>
+      </div>
+      <div class="hope-item">
+        <div class="hope-num">1 tahun</div>
+        <div class="hope-label">Risiko penyakit jantung turun 50%</div>
+      </div>
+      <div class="hope-item">
+        <div class="hope-num">10 tahun</div>
+        <div class="hope-label">Risiko kanker paru setara non-perokok</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section>
+  <div class="section-title">🧠 Quiz Kesehatan</div>
+  <div class="section-sub">Uji pengetahuanmu tentang bahaya rokok &amp; vape — 8 soal dari data jurnal</div>
+  <div class="quiz-wrap">
+    <div class="quiz-header">
+      <h3>Quiz Bahaya Rokok &amp; Vape</h3>
+      <span id="quiz-counter">Soal 1 / 8</span>
+    </div>
+    <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="quiz-progress"></div></div>
+    <div class="quiz-body">
+      <div class="quiz-question" id="quiz-question"></div>
+      <div class="quiz-options" id="quiz-options"></div>
+      <div class="quiz-explanation" id="quiz-explanation"></div>
+      <div class="quiz-result" id="quiz-result" style="display:none"></div>
+      <div class="quiz-footer" id="quiz-footer">
+        <div class="quiz-score-mini">Benar: <b id="quiz-score-display">0</b> / <span id="quiz-total-display">0</span></div>
+        <button class="quiz-btn" id="quiz-next-btn" disabled>Lanjut →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>Infografis Kesehatan · Bahaya Rokok &amp; Vape · Sumber: Masrida et al. (2022), GLOBOCAN 2020, WHO, Kemenkes RI, Gandini et al. (2008)</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+// Data SAM (Smoking Attributable Mortality) dari jurnal Masrida et al., 2022
+// Total SAM = 39.217; dibulatkan ke persen terdekat
+const data = [
+  { label: 'Kanker Paru-paru', pct: 45.6, color: '#dc2626' },   // SAM 17.902
+  { label: 'Kanker Faring',    pct: 21.6, color: '#ea580c' },   // SAM 8.491
+  { label: 'Kanker Hati',      pct: 14.2, color: '#d97706' },   // SAM 5.583
+  { label: 'Kanker Kandung Kemih', pct: 3.6, color: '#7c3aed' },// SAM 1.416
+  { label: 'Kanker Laring',    pct: 3.6, color: '#0891b2' },    // SAM 1.394
+  { label: 'Kanker Lainnya',   pct: 11.4, color: '#6b7280' },   // SAM sisanya
+];
+
+const legend = document.getElementById('legend');
+data.forEach((d, i) => {
+  const el = document.createElement('div');
+  el.className = 'legend-item';
+  el.innerHTML = `<div class="legend-dot" style="background:${d.color}"></div><div><div class="legend-label">${d.label}</div><div class="legend-pct">${d.pct}% dari total SAM akibat rokok</div></div>`;
+  el.onclick = () => chart.setDatasetVisibility(0, true) && chart.update();
+  legend.appendChild(el);
+});
+
+const chart = new Chart(document.getElementById('pie'), {
+  type: 'doughnut',
+  data: {
+    labels: data.map(d => d.label),
+    datasets: [{
+      data: data.map(d => d.pct),
+      backgroundColor: data.map(d => d.color),
+      borderColor: '#faf8f4',
+      borderWidth: 3,
+      hoverOffset: 10,
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: true,
+    cutout: '55%',
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: ctx => ` ${ctx.label}: ${ctx.parsed}%`
+        }
+      }
+    }
+  }
+});
+</script>
+<script>
+const quizData = [
+  {
+    q: "Berapa total estimasi kematian kanker akibat rokok di Indonesia tahun 2020 menurut jurnal Masrida et al.?",
+    opts: ["225.000 jiwa", "39.217 jiwa", "97.121 jiwa", "16.986 jiwa"],
+    ans: 1,
+    exp: "Berdasarkan jurnal Masrida et al. (2022), total SAM (Smoking Attributable Mortality) di Indonesia tahun 2020 adalah 39.217 jiwa — terdiri dari 37.354 laki-laki dan 1.863 perempuan."
+  },
+  {
+    q: "Kanker apa yang memiliki nilai SAM (Smoking Attributable Mortality) tertinggi pada laki-laki di Indonesia?",
+    opts: ["Kanker faring", "Kanker laring", "Kanker paru-paru", "Kanker hati"],
+    ans: 2,
+    exp: "Kanker paru-paru memiliki SAM tertinggi pada laki-laki sebesar 16.986 kasus, jauh di atas kanker faring (8.195) dan kanker hati (5.534). SAF kanker paru-paru laki-laki mencapai 88%."
+  },
+  {
+    q: "Berapa nilai Smoking Attributable Fraction (SAF) kanker paru-paru pada laki-laki di Indonesia?",
+    opts: ["34,25%", "67,57%", "83,18%", "88,00%"],
+    ans: 3,
+    exp: "SAF kanker paru-paru pada laki-laki adalah 88,00% — artinya 88% kematian kanker paru pada laki-laki disebabkan oleh kebiasaan merokok. Ini merupakan SAF tertinggi dari semua jenis kanker."
+  },
+  {
+    q: "Indonesia menempati urutan ke berapa dalam prevalensi perokok terbesar di dunia?",
+    opts: ["Pertama", "Kedua", "Ketiga", "Keempat"],
+    ans: 2,
+    exp: "Indonesia menduduki urutan ketiga dengan jumlah prevalensi perokok terbesar di dunia, setelah China dan India (Kemenkes RI, 2018)."
+  },
+  {
+    q: "Zat karsinogen apa yang terkandung dalam rokok dan bersifat polycyclic aromatic hydrocarbon (PAH)?",
+    opts: ["Nikotin dan diacetyl", "Tar, benzopiren, dan vinil klorida", "Timbal dan nikel", "Karbon dioksida dan oksigen"],
+    ans: 1,
+    exp: "Rokok mengandung senyawa karsinogen PAH seperti tar, benzopiren (benzopi), vinil klorida, dan nitro-nor-nikotin yang terbukti menyebabkan kanker (Aji et al., 2015)."
+  },
+  {
+    q: "Pada perempuan, kanker apa yang memiliki SAM tertinggi kedua setelah kanker paru-paru?",
+    opts: ["Kanker faring", "Kanker laring", "Kanker serviks", "Kanker kandung kemih"],
+    ans: 2,
+    exp: "Pada perempuan, urutan SAM tertinggi adalah: kanker paru-paru (916), kanker serviks (439), dan kanker faring (296). Kanker serviks menempati posisi kedua meskipun hubungannya dengan rokok lebih kompleks."
+  },
+  {
+    q: "Zat berbahaya dalam vape yang menyebabkan 'popcorn lung' (bronkiolitis obliterans) adalah…",
+    opts: ["Nikotin", "Karbon monoksida", "Diacetyl", "Tar"],
+    ans: 2,
+    exp: "Diacetyl adalah senyawa dalam cairan vape yang bila terhirup menyebabkan bronkiolitis obliterans atau 'popcorn lung' — kondisi kerusakan permanen pada bronkiolus paru-paru."
+  },
+  {
+    q: "Berapa estimasi prevalensi perokok laki-laki di Indonesia tahun 2020 menurut Amul dan Pang (2018)?",
+    opts: ["62,9%", "67,0%", "75,3%", "82,7%"],
+    ans: 3,
+    exp: "Menurut estimasi Amul dan Pang (2018) yang digunakan dalam jurnal Masrida et al., prevalensi perokok laki-laki Indonesia tahun 2020 mencapai 82,7%, sedangkan perempuan 3,0%."
+  },
+];
+
+let current = 0, score = 0, answered = false;
+
+function renderQuiz() {
+  const q = quizData[current];
+  document.getElementById('quiz-counter').textContent = `Soal ${current + 1} / ${quizData.length}`;
+  document.getElementById('quiz-progress').style.width = `${(current / quizData.length) * 100}%`;
+  document.getElementById('quiz-question').textContent = q.q;
+  document.getElementById('quiz-explanation').className = 'quiz-explanation';
+  document.getElementById('quiz-explanation').textContent = '';
+  document.getElementById('quiz-score-display').textContent = score;
+  document.getElementById('quiz-total-display').textContent = current;
+  document.getElementById('quiz-result').style.display = 'none';
+  document.getElementById('quiz-footer').style.display = 'flex';
+
+  const optWrap = document.getElementById('quiz-options');
+  optWrap.innerHTML = '';
+  answered = false;
+  document.getElementById('quiz-next-btn').disabled = true;
+
+  q.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'quiz-option';
+    btn.textContent = opt;
+    btn.onclick = () => handleAnswer(i);
+    optWrap.appendChild(btn);
+  });
+}
+
+function handleAnswer(chosen) {
+  if (answered) return;
+  answered = true;
+  const q = quizData[current];
+  const btns = document.querySelectorAll('.quiz-option');
+
+  btns.forEach((btn, i) => {
+    btn.disabled = true;
+    if (i === q.ans) btn.classList.add('correct');
+    else if (i === chosen && chosen !== q.ans) btn.classList.add('wrong');
+  });
+
+  if (chosen === q.ans) score++;
+
+  const exp = document.getElementById('quiz-explanation');
+  exp.textContent = '💡 ' + q.exp;
+  exp.classList.add('show');
+  document.getElementById('quiz-score-display').textContent = score;
+  document.getElementById('quiz-total-display').textContent = current + 1;
+  document.getElementById('quiz-next-btn').disabled = false;
+}
+
+document.getElementById('quiz-next-btn').onclick = () => {
+  current++;
+  if (current < quizData.length) {
+    renderQuiz();
+  } else {
+    showResult();
+  }
+};
+
+function showResult() {
+  document.getElementById('quiz-question').textContent = '';
+  document.getElementById('quiz-options').innerHTML = '';
+  document.getElementById('quiz-explanation').className = 'quiz-explanation';
+  document.getElementById('quiz-footer').style.display = 'none';
+
+  const pct = Math.round((score / quizData.length) * 100);
+  let emoji, title, msg;
+  if (pct >= 87) { emoji = '🏆'; title = 'Luar Biasa!'; msg = 'Kamu sangat paham bahaya rokok dan vape. Teruskan gaya hidup sehat dan sebarkan pengetahuan ini!'; }
+  else if (pct >= 62) { emoji = '👍'; title = 'Bagus!'; msg = 'Pengetahuanmu cukup baik. Pelajari lagi beberapa fakta penting agar semakin paham.'; }
+  else if (pct >= 37) { emoji = '📖'; title = 'Lumayan!'; msg = 'Masih ada ruang untuk belajar. Baca kembali infografis di atas dan coba lagi!'; }
+  else { emoji = '🌱'; title = 'Yuk Belajar Lagi!'; msg = 'Jangan menyerah! Scroll ke atas, baca datanya, dan coba quiz lagi untuk hasil lebih baik.'; }
+
+  document.getElementById('quiz-progress').style.width = '100%';
+  document.getElementById('quiz-counter').textContent = `Selesai!`;
+
+  const res = document.getElementById('quiz-result');
+  res.style.display = 'block';
+  res.innerHTML = `
+    <div class="quiz-result-emoji">${emoji}</div>
+    <div class="score-big">${score} / ${quizData.length}</div>
+    <h4>${title}</h4>
+    <p>${msg}</p>
+    <p style="font-size:.75rem;color:#b0a090;margin-bottom:.8rem">Skor kamu: ${pct}%</p>
+    <button class="quiz-restart" onclick="restartQuiz()">🔄 Coba Lagi</button>
+  `;
+}
+
+function restartQuiz() {
+  current = 0; score = 0;
+  renderQuiz();
+}
+
+renderQuiz();
+</script>
+</body>
+</html>
